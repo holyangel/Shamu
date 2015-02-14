@@ -1180,9 +1180,10 @@ static struct file_operations fops = {
 static ssize_t show_rtp_strength(struct device *dev,
 		struct device_attribute *attr, char *buf)
 {
-	size_t count = 0;
-	count += sprintf(buf, "%d\n", rtp_strength - 27);
-	return count;
+	if (rtp_strength == 0)
+		return snprintf(buf, PAGE_SIZE, "%d\n", 0);
+	else
+		return snprintf(buf, PAGE_SIZE, "%d\n", rtp_strength - 27);
 }
 
 static ssize_t store_rtp_strength(struct device *dev,
@@ -1195,11 +1196,11 @@ static ssize_t store_rtp_strength(struct device *dev,
 	}
 
 	if (input > 100)
-		input = 100;
-	else if (input < 0)
-		input = 0;
-
-	rtp_strength = input + 27;
+		rtp_strength = 127;
+	else if (input <= 0)
+		rtp_strength = 0;
+	else
+		rtp_strength = input + 27;
 	return count;
 }
 
