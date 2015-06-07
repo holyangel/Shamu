@@ -49,6 +49,42 @@ struct gpio_keys_drvdata {
 	struct gpio_button_data data[0];
 };
 
+#ifdef PERIODIC_CHECK_GPIOS
+static unsigned __msm_gpio_get_inout_lh(unsigned gpio)
+{
+    return __raw_readl(GPIO_IN_OUT(gpio)) & BIT(GPIO_IN_BIT);
+}
+
+static void sec_gpiocheck_work(struct work_struct *work)
+{
+    struct gpiomux_setting val;
+    u32 i = PERIODIC_CHECK_GPIONUM;
+
+    __msm_gpiomux_read(i, &val);
+
+    printk(KERN_DEBUG "[gpio=%d] func=%d, drv=%d, full=%d, dir=%d dat=%d\n",
+            i, val.func, val.drv, val.pull, val.dir, __msm_gpio_get_inout_lh(i) );
+
+    schedule_delayed_work(&g_gpio_check_work, msecs_to_jiffies(PERIODIC_CHECK_GAP));
+}
+#endif
+
+static void sync_system(struct work_struct *work);
+static DECLARE_WORK(sync_system_work, sync_system);
+struct wake_lock sync_wake_lock;
+
+static void sync_system(struct work_struct *work)
+{
+	if (power_suspended)
+		msleep(5000);
+
+	pr_info("%s +\n", __func__);
+	wake_lock(&sync_wake_lock);
+	sys_sync();
+	wake_unlock(&sync_wake_lock);
+	pr_info("%s -\n", __func__);
+}
+
 /*
  * SYSFS interface for enabling/disabling keys and switches:
  *
@@ -322,6 +358,107 @@ static struct attribute_group gpio_keys_attr_group = {
 	.attrs = gpio_keys_attrs,
 };
 
+#ifdef KEY_BOOSTER
+static void gpio_key_change_dvfs_lock(struct work_struct *work)
+{
+	struct gpio_button_data *bdata =
+		container_of(work,
+			struct gpio_button_data, work_dvfs_chg.work);
+	int retval;
+	mutex_lock(&bdata->dvfs_lock);
+	retval = set_freq_limit(DVFS_TOUCH_ID,
+			MIN_TOUCH_LIMIT_SECOND);
+	if (retval < 0)
+		printk(KERN_ERR
+			"%s: booster change failed(%d).\n",
+			__func__, retval);
+	mutex_unlock(&bdata->dvfs_lock);
+}
+
+static void gpio_key_set_dvfs_off(struct work_struct *work)
+{
+	struct gpio_button_data *bdata =
+		container_of(work,
+			struct gpio_button_data, work_dvfs_off.work);
+	int retval;
+	mutex_lock(&bdata->dvfs_lock);
+	retval = set_freq_limit(DVFS_TOUCH_ID, -1);
+	if (retval < 0)
+		printk(KERN_ERR
+			"%s: booster stop failed(%d).\n",
+			__func__, retval);
+	bdata->dvfs_lock_status = false;
+	mutex_unlock(&bdata->dvfs_lock);
+}
+
+static void gpio_key_set_dvfs_lock(struct gpio_button_data *bdata,
+					uint32_t on)
+{
+	mutex_lock(&bdata->dvfs_lock);
+	if (on == 0) {
+		if (bdata->dvfs_lock_status) {
+			schedule_delayed_work(&bdata->work_dvfs_off,
+				msecs_to_jiffies(KEY_BOOSTER_OFF_TIME));
+		}
+	} else if (on == 1) {
+		cancel_delayed_work(&bdata->work_dvfs_off);
+		if (!bdata->dvfs_lock_status) {
+			int ret = 0;
+			ret = set_freq_limit(DVFS_TOUCH_ID,
+					MIN_TOUCH_LIMIT);
+			if (ret < 0)
+				printk(KERN_ERR
+					"%s: cpu first lock failed(%d)\n",
+					__func__, ret);
+
+			schedule_delayed_work(&bdata->work_dvfs_chg,
+				msecs_to_jiffies(KEY_BOOSTER_CHG_TIME));
+			bdata->dvfs_lock_status = true;
+		}
+	}
+	mutex_unlock(&bdata->dvfs_lock);
+}
+
+
+static int gpio_key_init_dvfs(struct gpio_button_data *bdata)
+{
+	mutex_init(&bdata->dvfs_lock);
+
+	INIT_DELAYED_WORK(&bdata->work_dvfs_off, gpio_key_set_dvfs_off);
+	INIT_DELAYED_WORK(&bdata->work_dvfs_chg, gpio_key_change_dvfs_lock);
+
+	bdata->dvfs_lock_status = false;
+	return 0;
+}
+#endif
+
+static inline int64_t get_time_inms(void) {
+	int64_t tinms;
+	struct timespec cur_time = current_kernel_time();
+	tinms =  cur_time.tv_sec * MSEC_PER_SEC;
+	tinms += cur_time.tv_nsec / NSEC_PER_MSEC;
+	return tinms;
+}
+
+extern void mdnie_toggle_negative(void);
+
+void gpio_sync_worker(bool pwr)
+{
+	/* sys_sync(); */
+	if (power_suspended) {
+		if (pwr)
+			pr_info("%s: KEY_POWER pressed, calling sys_sync() in 5 sec...\n", __func__);
+		else
+			pr_info("%s: KEY_HOME pressed, calling sys_sync() in 5 sec...\n", __func__);
+	} else {
+		if (pwr)
+			pr_info("%s: KEY_POWER pressed, calling sys_sync()\n", __func__);
+		else
+			pr_info("%s: KEY_HOME pressed, calling sys_sync()\n", __func__);
+	}
+	schedule_work(&sync_system_work);
+}
+
 static void gpio_keys_gpio_report_event(struct gpio_button_data *bdata)
 {
 	const struct gpio_keys_button *button = bdata->button;
@@ -336,6 +473,50 @@ static void gpio_keys_gpio_report_event(struct gpio_button_data *bdata)
 		input_event(input, type, button->code, !!state);
 	}
 	input_sync(input);
+	if (!power_suspended) {
+		//mdnie negative effect toggle by gm
+		if (button->code == 172) {
+			if (state) {
+				gpio_sync_worker(false);
+				if (get_time_inms() - homekey_lasttime < 300) {
+					homekey_count++;
+					printk(KERN_INFO "repeated home_key action %d.\n", homekey_count);
+				} else {
+					homekey_count = 0;
+				}
+			} else {
+				if (homekey_count == 3) {
+					mdnie_toggle_negative();
+					homekey_count = 0;
+				}
+				homekey_lasttime = get_time_inms();
+			}
+		}
+	}
+}
+
+static int gpio_keys_suspend(struct gpio_keys_drvdata *ddata);
+static int gpio_keys_resume(struct gpio_keys_drvdata *ddata);
+static void gpio_keys_early_suspend(struct power_suspend *handler)
+{
+	struct gpio_keys_drvdata *ddata =
+		container_of(handler, struct gpio_keys_drvdata,
+				power_suspend);
+
+	gpio_keys_suspend(ddata);
+
+	return;
+}
+
+static void gpio_keys_late_resume(struct power_suspend *handler)
+{
+	struct gpio_keys_drvdata *ddata =
+		container_of(handler, struct gpio_keys_drvdata,
+				power_suspend);
+
+	gpio_keys_resume(ddata);
+
+	return;
 }
 
 static void gpio_keys_gpio_work_func(struct work_struct *work)
