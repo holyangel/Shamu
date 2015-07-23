@@ -82,6 +82,10 @@ GTAGS
 
 *.orig
 *~
+*.list
+modules
+stock
+arch/arm/crypto/sha256-core.S
 \#*#
 
 #
