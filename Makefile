@@ -351,7 +351,7 @@ CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 CFLAGS_MODULE   =
 AFLAGS_MODULE   =
 LDFLAGS_MODULE  =
-CFLAGS_KERNEL	= -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-gcse -fsched-spec-load -fsingle-precision-constant -floop-nest-optimize -fgraphite-identity -ftree-loop-distribution -ftree-loop-im -ftree-loop-ivcanon -fivopts -ftree-vectorize -ftree-loop-vectorize -fvariable-expansion-in-unroller -fno-prefetch-loop-arrays -mtune=cortex-a15 -mfpu=neon-vfpv4 -mcpu=cortex-a15
+CFLAGS_KERNEL	= -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-gcse -fsched-spec-load -fsingle-precision-constant -floop-nest-optimize -fgraphite-identity -ftree-loop-distribution -ftree-loop-im -ftree-loop-ivcanon -fivopts -ftree-vectorize -ftree-loop-vectorize -fvariable-expansion-in-unroller -fno-prefetch-loop-arrays -march=armv7-a -mfpu=neon-vfpv4 -mfloat-abi=hard -mtune=cortex-a15 -pipe
 AFLAGS_KERNEL	=
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
