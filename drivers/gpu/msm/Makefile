@@ -1,4 +1,4 @@
-ccflags-y := -Iinclude/uapi/drm -Iinclude/drm -Idrivers/gpu/msm
+ccflags-y := -Iinclude/uapi/drm -Iinclude/drm -Idrivers/gpu/msm -O2 -mcpu=cortex-a15 -mtune=cortex-a15 -mfpu=neon-vfpv4
 
 msm_kgsl_core-y = \
 	kgsl.o \
