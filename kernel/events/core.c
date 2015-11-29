@@ -1309,7 +1309,6 @@ static void __ref perf_remove_from_context(struct perf_event *event)
 		/*
 		 * Per cpu events are removed via an smp call
 		 */
-		cpu_function_call(event->cpu, __perf_remove_from_context, event);
 		ret = cpu_function_call(event->cpu, __perf_remove_from_context,
 					event);
 		if (ret == -ENXIO)
@@ -2041,9 +2040,6 @@ static void __perf_event_sync_stat(struct perf_event *event,
 	perf_event_update_userpage(event);
 	perf_event_update_userpage(next_event);
 }
-
-#define list_next_entry(pos, member) \
-	list_entry(pos->member.next, typeof(*pos), member)
 
 static void perf_event_sync_stat(struct perf_event_context *ctx,
 				   struct perf_event_context *next_ctx)

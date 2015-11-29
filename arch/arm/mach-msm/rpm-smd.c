@@ -1,4 +1,4 @@
-/* Copyright (c) 2012-2014, The Linux Foundation. All rights reserved.
+/* Copyright (c) 2012-2015, The Linux Foundation. All rights reserved.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -23,6 +23,7 @@
 #include <linux/irq.h>
 #include <linux/list.h>
 #include <linux/mutex.h>
+#include <linux/rtmutex.h>
 #include <linux/spinlock.h>
 #include <linux/string.h>
 #include <linux/device.h>
@@ -865,7 +866,7 @@ static void msm_rpm_smd_work(struct work_struct *work)
 	char buf[MAX_ERR_BUFFER_SIZE] = {0};
 
 	while (1) {
-		wait_for_completion(&data_ready);
+		wait_for_completion_interruptible(&data_ready);
 
 		spin_lock(&msm_rpm_data.smd_lock_read);
 		while (smd_is_pkt_avail(msm_rpm_data.ch_info)) {
@@ -1152,11 +1153,11 @@ static int msm_rpm_send_data(struct msm_rpm_request *cdata,
 int msm_rpm_send_request(struct msm_rpm_request *handle)
 {
 	int ret;
-	static DEFINE_MUTEX(send_mtx);
+	static DEFINE_RT_MUTEX(send_mtx);
 
-	mutex_lock(&send_mtx);
+	rt_mutex_lock(&send_mtx);
 	ret = msm_rpm_send_data(handle, MSM_RPM_MSG_REQUEST_TYPE, false);
-	mutex_unlock(&send_mtx);
+	rt_mutex_unlock(&send_mtx);
 
 	return ret;
 }
@@ -1170,6 +1171,7 @@ EXPORT_SYMBOL(msm_rpm_send_request_noirq);
 
 int msm_rpm_wait_for_ack(uint32_t msg_id)
 {
+	static DEFINE_RT_MUTEX(msm_rpm_smd_lock);
 	struct msm_rpm_wait_data *elem;
 	int rc = 0;
 
@@ -1188,7 +1190,9 @@ int msm_rpm_wait_for_ack(uint32_t msg_id)
 	if (!elem)
 		return rc;
 
+	rt_mutex_lock(&msm_rpm_smd_lock);
 	wait_for_completion(&elem->ack);
+	rt_mutex_unlock(&msm_rpm_smd_lock);
 	trace_rpm_ack_recd(0, msg_id);
 
 	rc = elem->errno;

@@ -39,6 +39,17 @@
 #include "wcd9xxx-resmgr.h"
 #include "wcd9xxx-common.h"
 
+struct sound_control {
+	struct snd_soc_codec *snd_control_codec;
+	int default_headphones_value;
+	int default_mic_value;
+	bool playback_lock;
+	bool recording_lock;
+} soundcontrol = {
+	.playback_lock = false,
+	.recording_lock = false,
+};
+
 #define TAIKO_MAD_SLIMBUS_TX_PORT 12
 #define TAIKO_MAD_AUDIO_FIRMWARE_PATH "wcd9320/wcd9320_mad_audio.bin"
 #define TAIKO_VALIDATE_RX_SBPORT_RANGE(port) ((port >= 16) && (port <= 22))
@@ -7201,6 +7212,15 @@ static int taiko_codec_probe(struct snd_soc_codec *codec)
 	snd_soc_dapm_sync(dapm);
 
 	codec->ignore_pmdown_time = 1;
+
+	/*
+	 * Get the default values during probe
+	 */
+	soundcontrol.default_headphones_value = taiko_read(codec,
+		TAIKO_A_CDC_RX1_VOL_CTL_B2_CTL);
+	soundcontrol.default_mic_value = taiko_read(codec,
+		TAIKO_A_CDC_TX3_VOL_CTL_GAIN);
+
 	return ret;
 
 err_irq:

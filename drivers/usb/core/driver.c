@@ -29,9 +29,12 @@
 #include <linux/usb/quirks.h>
 #include <linux/usb/hcd.h>
 #include <linux/debugfs.h>
+#include <linux/module.h>
 
-#include "usb.h"
+#include "hub.h"
 
+static unsigned int enable_dbg = 0;
+module_param(enable_dbg, uint, S_IRUGO | S_IWUSR);
 
 /* Maximum debug message length */
 #define DBG_MSG_LEN   128UL
@@ -76,6 +79,9 @@ dbg_log_event(struct dbg_data *d, struct usb_interface *iface,
 	unsigned long flags;
 	int num;
 	char tbuf[TIME_BUF_LEN];
+
+	if (!enable_dbg)
+		return;
 
 	/*only log for count 0/1 or negative*/
 	if (usage_cnt > 1)
@@ -1998,6 +2004,37 @@ int usb_set_usb2_hardware_lpm(struct usb_device *udev, int enable)
 	}
 
 	return ret;
+}
+
+int get_intf_with_pwr_usage_count(struct usb_device *hdev)
+{
+	struct usb_interface    *intf;
+	struct usb_hub          *hub;
+	struct usb_port         *port;
+	int i;
+
+	if (!hdev)
+		return -ENXIO;
+
+	hub = usb_hub_to_struct_hub(hdev);
+	if (!hub)
+		return -ENXIO;
+
+	port = *hub->ports;
+	if (!port || !port->child || !port->child->actconfig)
+		return -ENXIO;
+
+	for (i = 0; i < port->child->actconfig->desc.bNumInterfaces; i++) {
+		intf = port->child->actconfig->interface[i];
+		if (atomic_read(&intf->dev.power.usage_count) > 1) {
+			dev_dbg(&port->child->dev,
+				"udev:%s intf: %s usage_cnt is not zero\n",
+				port->child->dev.kobj.name,
+				intf->dev.kobj.name);
+			return i;
+		}
+	}
+	return -ENXIO;
 }
 
 #endif /* CONFIG_PM_RUNTIME */

@@ -125,7 +125,7 @@ enum {
 	MSM_MPM_DEBUG_NON_DETECTABLE_IRQ_IDLE = BIT(3),
 };
 
-static int msm_mpm_debug_mask = 1;
+static int msm_mpm_debug_mask = 0;
 module_param_named(
 	debug_mask, msm_mpm_debug_mask, int, S_IRUGO | S_IWUSR | S_IWGRP
 );
@@ -544,6 +544,7 @@ void msm_mpm_enter_sleep(uint32_t sclk_count, bool from_idle,
 void msm_mpm_exit_sleep(bool from_idle)
 {
 	unsigned long pending;
+	uint32_t *enabled_intr;
 	int i;
 	int k;
 
@@ -552,12 +553,16 @@ void msm_mpm_exit_sleep(bool from_idle)
 		return;
 	}
 
+	enabled_intr = from_idle ? msm_mpm_enabled_irq :
+						msm_mpm_wake_irq;
+
 	for (i = 0; i < MSM_MPM_REG_WIDTH; i++) {
 		pending = msm_mpm_read(MSM_MPM_REG_STATUS, i);
+		pending &= enabled_intr[i];
 
 		if (MSM_MPM_DEBUG_PENDING_IRQ & msm_mpm_debug_mask)
-			pr_info("%s: pending.%d: 0x%08lx", __func__,
-					i, pending);
+			pr_info("%s: enabled_intr.%d pending.%d: 0x%08x 0x%08lx\n",
+				__func__, i, i, enabled_intr[i], pending);
 
 		k = find_first_bit(&pending, 32);
 		while (k < 32) {
@@ -635,7 +640,7 @@ static void msm_mpm_work_fn(struct work_struct *work)
 	unsigned long flags;
 	while (1) {
 		bool allow;
-		wait_for_completion(&wake_wq);
+		wait_for_completion_interruptible(&wake_wq);
 		spin_lock_irqsave(&msm_mpm_lock, flags);
 		allow = msm_mpm_irqs_detectable(true) &&
 				msm_mpm_gpio_irqs_detectable(true);
@@ -708,7 +713,8 @@ static int msm_mpm_dev_probe(struct platform_device *pdev)
 		return -ENXIO;
 	}
 	ret = devm_request_irq(&pdev->dev, dev->mpm_ipc_irq, msm_mpm_irq,
-			IRQF_TRIGGER_RISING, pdev->name, msm_mpm_irq);
+			IRQF_TRIGGER_RISING | IRQF_NO_SUSPEND, pdev->name,
+			msm_mpm_irq);
 
 	if (ret) {
 		pr_info("%s(): request_irq failed errno: %d\n", __func__, ret);
@@ -745,12 +751,12 @@ static int msm_mpm_dev_probe(struct platform_device *pdev)
 	return 0;
 }
 
-static inline int __init mpm_irq_domain_linear_size(struct irq_domain *d)
+static inline int mpm_irq_domain_linear_size(struct irq_domain *d)
 {
 	return d->revmap_data.linear.size;
 }
 
-static inline int __init mpm_irq_domain_legacy_size(struct irq_domain *d)
+static inline int mpm_irq_domain_legacy_size(struct irq_domain *d)
 {
 	return d->revmap_data.legacy.size;
 }
