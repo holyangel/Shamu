@@ -1,7 +1,7 @@
 VERSION = 3
 PATCHLEVEL = 10
 SUBLEVEL = 40
-EXTRAVERSION = -SkyDragon-N-v1.3
+EXTRAVERSION = -SkyDragon-N-v1.3.1
 NAME = TOSSUG Baby Fish
 
 # *DOCUMENTATION*
@@ -241,26 +241,33 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 	  else if [ -x /bin/bash ]; then echo /bin/bash; \
 	  else echo sh; fi ; fi)
 
+# SkyDragon Optimization Flags #
+
+# Graphite
+GRAPHITE	:= -fgraphite -fgraphite-identity -floop-nest-optimize 
+
+# Extra GCC Optimizations	  
+EXTRA_OPTS	:= -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-align-functions -fno-align-loops \
+				-ftree-partial-pre  -fgcse -fgcse-lm -fgcse-sm -fgcse-las -fgcse-after-reload \
+                -fsched-spec-load -fsingle-precision-constant -fpredictive-commoning \
+				-fprofile-correction -fbranch-target-load-optimize2 -fipa-pta \
+                -fira-region=all -fira-hoist-pressure -fno-tree-ter -ftree-vectorize \
+                -fbranch-target-load-optimize2 -fsingle-precision-constant -fipa-pta \
+                
+				
+# Arm Architecture Specific
 # fall back to -march=armv8-a in case the compiler isn't compatible
 # with -mcpu and -mtune
-ARM_ARCH_OPT := -mcpu=cortex-a15 -mtune=cortex-a15 --param l1-cache-line-size=64 --param l1-cache-size=32 --param l2-cache-size=2048
+ARM_ARCH_OPT := -mcpu=cortex-a15 -mtune=cortex-a15 --param l1-cache-line-size=64 \
+				--param l1-cache-size=32 --param l2-cache-size=2048
 
-GEN_OPT_FLAGS := $(call cc-option,-march=krait) \
- -g0 \
- -DNDEBUG -pipe \
- -fomit-frame-pointer \
- -fmodulo-sched \
- -fmodulo-sched-allow-regmoves \
- -fivopts
-
-GRAPHITE	= -fgraphite -fgraphite-identity -floop-nest-optimize
-EXTRA_OPTS	= -fmodulo-sched -fmodulo-sched-allow-regmoves -floop-nest-optimize -ftree-loop-distribution \
-                  -ftree-loop-distribute-patterns -ftree-slp-vectorize \
-                  -ftree-loop-im -ftree-loop-ivcanon -fvariable-expansion-in-unroller \
-                  -ftree-partial-pre -fno-gcse -fsched-spec-load \
-                  -fira-region=all -fira-hoist-pressure \
-                  -fivopts -fno-tree-ter -ftree-vectorize -fprofile-correction \
-                  -fbranch-target-load-optimize2 -fsingle-precision-constant -fipa-pta
+# Optional
+GEN_OPT_FLAGS := $(call cc-option,-march=armv8-a) \
+ -g -DNDEBUG -pipe \
+ -fomit-frame-pointer -fivopts \
+ -fmodulo-sched -fmodulo-sched-allow-regmoves
+ 
+#####
 
 HOSTCC       = gcc
 HOSTCXX      = g++
