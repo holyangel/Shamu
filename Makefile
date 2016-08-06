@@ -243,7 +243,7 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 # fall back to -march=armv8-a in case the compiler isn't compatible
 # with -mcpu and -mtune
-ARM_ARCH_OPT := -mcpu=cortex-a7 -mtune=cortex-a7 --param l1-cache-line-size=16 --param l1-cache-size=16 --param l2-cache-size=2048
+ARM_ARCH_OPT := -mcpu=cortex-a15 -mtune=cortex-a15 --param l1-cache-line-size=64 --param l1-cache-size=32 --param l2-cache-size=2048
 
 GEN_OPT_FLAGS := $(call cc-option,-march=krait) \
  -g0 \
