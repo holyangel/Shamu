@@ -257,8 +257,8 @@ GRAPHITE	= -fgraphite -fgraphite-identity -floop-nest-optimize
 EXTRA_OPTS	= -fmodulo-sched -fmodulo-sched-allow-regmoves -floop-nest-optimize -ftree-loop-distribution \
                   -ftree-loop-distribute-patterns -ftree-slp-vectorize \
                   -ftree-loop-im -ftree-loop-ivcanon -fvariable-expansion-in-unroller \
-                  -ftree-partial-pre -fno-gcse -fsched-spec-load -fvect-cost-model=dynamic \
-                  -fsimd-cost-model=dynamic -fira-region=all -fira-hoist-pressure \
+                  -ftree-partial-pre -fno-gcse -fsched-spec-load \
+                  -fira-region=all -fira-hoist-pressure \
                   -fivopts -fno-tree-ter -ftree-vectorize -fprofile-correction \
                   -fbranch-target-load-optimize2 -fsingle-precision-constant -fipa-pta
 
