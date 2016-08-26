@@ -1,7 +1,7 @@
 VERSION = 3
 PATCHLEVEL = 10
 SUBLEVEL = 40
-EXTRAVERSION = -SkyDragon-dp5-v1
+EXTRAVERSION = -SkyDragon-dp5-v1.1
 NAME = TOSSUG Baby Fish
 
 # *DOCUMENTATION*
@@ -258,14 +258,14 @@ EXTRA_OPTS	= -fmodulo-sched -fmodulo-sched-allow-regmoves -floop-nest-optimize -
                   -ftree-loop-distribute-patterns -ftree-slp-vectorize \
                   -ftree-loop-im -ftree-loop-ivcanon -fvariable-expansion-in-unroller \
                   -ftree-partial-pre -fno-gcse -fsched-spec-load -fvect-cost-model=dynamic \
-                  -fsimd-cost-model=dynamic -fdeclone-ctor-dtor -fira-region=all -fira-hoist-pressure \
+                  -fsimd-cost-model=dynamic -fira-region=all -fira-hoist-pressure \
                   -fivopts -fno-tree-ter -ftree-vectorize -fprofile-correction \
                   -fbranch-target-load-optimize2 -fsingle-precision-constant -fipa-pta
 
 HOSTCC       = gcc
 HOSTCXX      = g++
 HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -fomit-frame-pointer $(GEN_OPT_FLAGS) $(GRAPHITE) $(EXTRA_OPTS)
-HOSTCXXFLAGS = -O3 $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT) $(GRAPHITE) $(EXTRA_OPTS) -mfpu=neon-vfpv4-d32
+HOSTCXXFLAGS = -O3 $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT) $(GRAPHITE) $(EXTRA_OPTS) -fdeclone-ctor-dtor -mfpu=neon-vfpv4-d32
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
