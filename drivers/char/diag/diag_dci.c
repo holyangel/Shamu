@@ -1643,7 +1643,7 @@ static int diag_process_dci_pkt_rsp(unsigned char *buf, int len)
 				    entry.cmd_code_hi == MODE_CMD)
 					if (entry.client_id != APPS_DATA)
 						continue;
-					ret = diag_send_dci_pkt(entry, req_buf,
+				ret = diag_send_dci_pkt(entry, req_buf,
 								req_len,
 								req_entry->tag);
 					found = 1;
