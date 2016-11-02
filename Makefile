@@ -1,7 +1,7 @@
 VERSION = 3
 PATCHLEVEL = 10
 SUBLEVEL = 40
-EXTRAVERSION = -SkyDragon-N-v1.3.1
+EXTRAVERSION = -SkyDragon-N-v1.4.3
 NAME = TOSSUG Baby Fish
 
 # *DOCUMENTATION*
@@ -247,23 +247,22 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 GRAPHITE	:= -fgraphite -fgraphite-identity -floop-nest-optimize 
 
 # Extra GCC Optimizations	  
-EXTRA_OPTS	:= -fmodulo-sched -fmodulo-sched-allow-regmoves -fno-align-functions -fno-align-loops \
+EXTRA_OPTS	:= -falign-functions=1 -falign-loops=16 -falign-jumps=1 -falign-labels=1 \
 				-ftree-partial-pre  -fgcse -fgcse-lm -fgcse-sm -fgcse-las -fgcse-after-reload \
                 -fsched-spec-load -fsingle-precision-constant -fpredictive-commoning \
 				-fprofile-correction -fbranch-target-load-optimize2 -fipa-pta \
-                -fira-region=all -fira-hoist-pressure -fno-tree-ter -ftree-vectorize \
-                -fbranch-target-load-optimize2 -fsingle-precision-constant -fipa-pta \
-                
+                -fira-region=all -fira-hoist-pressure -fno-tree-ter -ftree-vectorize 
+                 
 				
 # Arm Architecture Specific
 # fall back to -march=armv8-a in case the compiler isn't compatible
 # with -mcpu and -mtune
-ARM_ARCH_OPT := -mcpu=cortex-a15 -mtune=cortex-a15 --param l1-cache-line-size=64 \
+ARM_ARCH_OPT := $(call cc-option,-march=armv7-a) -mcpu=cortex-a15 -mtune=cortex-a15 --param l1-cache-line-size=64 \
 				--param l1-cache-size=32 --param l2-cache-size=2048
 
 # Optional
-GEN_OPT_FLAGS := $(call cc-option,-march=armv8-a) \
- -g -DNDEBUG -pipe \
+GEN_OPT_FLAGS := \
+ -DNDEBUG -pipe \
  -fomit-frame-pointer -fivopts \
  -fmodulo-sched -fmodulo-sched-allow-regmoves
  
@@ -376,8 +375,8 @@ CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
 
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
-CFLAGS_MODULE   = -DMODULE $(CFLAGS_KERNEL) 
-AFLAGS_MODULE   = -DMODULE $(CFLAGS_KERNEL)
+CFLAGS_MODULE   = -DMODULE $(CFLAGS_KERNEL) -flto
+AFLAGS_MODULE   = -DMODULE $(CFLAGS_KERNEL) -flto
 LDFLAGS_MODULE  = --strip-debug
 CFLAGS_KERNEL	= -fno-prefetch-loop-arrays $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT) $(GRAPHITE) $(EXTRA_OPTS) -std=gnu89 
 AFLAGS_KERNEL	= $(CFLAGS_KERNEL)
@@ -411,8 +410,8 @@ KBUILD_CFLAGS   := -Wall -Wundef -Wstrict-prototypes -Wno-trigraphs \
 KBUILD_AFLAGS_KERNEL := $(GRAPHITE) $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT)
 KBUILD_CFLAGS_KERNEL := $(GRAPHITE) $(EXTRA_OPTS) $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT)
 KBUILD_AFLAGS   := -D__ASSEMBLY__
-KBUILD_AFLAGS_MODULE  := -DMODULE $(GRAPHITE) $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT)
-KBUILD_CFLAGS_MODULE  := -DMODULE $(GRAPHITE) $(EXTRA_OPTS) $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT)
+KBUILD_AFLAGS_MODULE  := -DMODULE $(GRAPHITE) $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT) -flto
+KBUILD_CFLAGS_MODULE  := -DMODULE $(GRAPHITE) $(EXTRA_OPTS) $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT) -flto
 KBUILD_LDFLAGS_MODULE := -T $(srctree)/scripts/module-common.lds
 
 # Read KERNELRELEASE from include/config/kernel.release (if it exists)
