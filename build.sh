@@ -1,58 +1,86 @@
 #!/bin/bash
+############################################################
+### Build script for HolyDragon kernel ###
+############################################################
 
-##############################
+# This is the full build script used to build the official kernel zip.
 
-# Defconfig
+# Minimum requirements to build:
+# Already working build environment :P 
+#
+# In this script: 
+# You will need to change the 'Source path to kernel tree' to match your current path to this source.
+# You will need to change the 'Compile Path to out' to match your current path to this source.
+# You will also need to edit the '-j32' under 'Start Compile' section and adjust that to match the amount of cores you want to use to build.
+# 
+# In Makefile: 
+# You will need to edit the 'CROSS_COMPILE=' line to match your current path to this source.
+# 
+# Once those are done, you should be able to execute './build.sh' from terminal and receive a working zip.
+
+############################################################
+# Build Script Variables
+############################################################ 
+
+# Source defconfig used to build
 	dc=sd_defconfig
 
 # Path to kernel source
-	k=/home/holyangel/android/Shamu
+	k=/home/holyangel/android/Kernels/Shamu
 
 # Path to clean out
-	co=~/android/Shamu/out
+	co=$k/out
 
 # Compile Path to out
-	o="O=/home/holyangel/android/Shamu/out"
+	o="O=/home/holyangel/android/Kernels/Shamu/out"
 
 # Path to image.gz-dtb
-	i=~/android/Shamu/out/arch/arm/boot/zImage-dtb
+	i=$k/out/arch/arm/boot/zImage-dtb
 
-# Kernel zip module path
-	zm=~/Downloads/SkyDragon_Shamu_V3/Build/modules
+# Destination Path for compiled modules
+	zm=$k/build/system/lib/modules
 
-# Completed kernel zimage path
-	zi=~/Downloads/SkyDragon_Shamu_V3/Build/zImage
+# Destination path for compiled Image.gz-dtb
+	zi=$k/build/kernel/zImage
 	
-# Path to whole kernel zip folders
-	zp=~/Downloads/SkyDragon_Shamu_V3/Build/
+# Source path for building kernel zip
+	zp=$k/build/
 	
-# Path to whole kernel zip folders
-	zu=~/Downloads/SkyDragon_Shamu_V3/Upload/
+# Destination Path for uploading kernel zip
+	zu=$k/upload/
 
 # Kernel zip Name
 	kn=SDK_Shamu_V3.zip
 
 ##############################
 
+############################################################
 # Cleanup
+############################################################
+
 	echo "	Cleaning up out directory"
-	rm -rf "$co"
+	rm -Rf out/
 	echo "	Out directory removed!"
 
-##############################
+############################################################
+# Make out folder
+############################################################
 
-# Make out
 	echo "	Making new out directory"
 	mkdir -p "$co"
 	echo "	Created new out directory"
 
-##############################
-
+############################################################
 # Establish defconfig
+############################################################
+
 	echo "	Establishing build environment.."
 	make "$o" "$dc"
 
+############################################################
 # Start Compile
+############################################################
+
 	echo "	First pass started.."
 	make "$o" -j64
 	echo "	First pass completed!"
@@ -61,17 +89,22 @@
 	make "$o" -j64
 	echo "	Second pass completed!"
 
-##############################
+############################################################
+# Copy image.gz-dtb to /build
+############################################################
 
-# Copy completed kernel to zip
 	echo "	Copying kernel to zip directory"
 	cp "$i" "$zi"
 	find . -name "*.ko" -exec cp {} "$zm" \;
 	echo "	Copying kernel completed!"
-	
-##############################
 
-# Zip files for upload
+############################################################
+# Generating Changelog to /build
+############################################################
+
+############################################################
+# Make zip and move to /upload
+############################################################
 
 	echo "	Making zip file.."
 	cd "$zp"
