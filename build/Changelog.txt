@@ -1,0 +1,87 @@
+====================
+     2018-08-02    
+====================
+37216c3  Update for version 1.0  [Miguel Martinez]
+fb5cfab  VFP: Build with hardfloat and vfpv4-d32  [Miguel Martinez]
+835f981  Final settings for building with LLVM/Clang 6  [Miguel Martinez]
+6dfa756  Makefile: Disable Readable_ASM/Frame_Pointer/Function_Tracer  [Miguel Martinez]
+f62a0b0  Makefile: Set HolyDragon Optimization  [Miguel Martinez]
+723da53  Makefile: Import HolyDragon Optimization flags for Krait  [Miguel Martinez]
+61eb4b6  Makefile: set toolchain  [Miguel Martinez]
+8479ffc  configs: set all settings for sd_defconfig  [Miguel Martinez]
+9808846  power: disable battery current limit hotplugging  [Miguel Martinez]
+b109d42  power: import fast charge support  [Miguel Martinez]
+fc97bb0  Scripts: Cleanup local version  [Miguel Martinez]
+6d95d49  devfreq: fix simple ondemand gpu algorithm  [Miguel Martinez]
+47e7b42  kgsl: schedule on high priority  [Miguel Martinez]
+d883382  devfreq: allocate on high priority workqueue  [Miguel Martinez]
+5f5df65  sounds: Import faux sound control 3  [Miguel Martinez]
+2f735b0  sound: optimize for size  [Miguel Martinez]
+91e0c9e  video: import savoca kcal control  [Miguel Martinez]
+a2cb1192  Import display_state header for Maple IO  [Miguel Martinez]
+325c771  fs/dcache: set vfs_cache_pressure to zero  [Miguel Martinez]
+9a9ac17  mm/vmscan: set swappiness to zero  [Miguel Martinez]
+36c3a7e  build: fix scripts pt2  [Miguel Martinez]
+e0454ef  block: Import Maple and Zen IOSchedulers  [Miguel Martinez]
+0872955  dts: Allow 27mhz gpu clock step and set as default  [Miguel Martinez]
+acb4dc0  compressed: target a15  [Miguel Martinez]
+67fc479  build: Fix scripts  [Miguel Martinez]
+107af62  Update gitignore  [Miguel Martinez]
+e348dc3  Import exfat  [Miguel Martinez]
+96898e5  include: Update compilers  [Miguel Martinez]
+cadcc9e  Create sd_defconfig  [Miguel Martinez]
+207f176  Import build system  [Miguel Martinez]
+
+====================
+     2018-08-01    
+====================
+
+====================
+     2018-07-31    
+====================
+
+====================
+     2018-07-30    
+====================
+
+====================
+     2018-07-29    
+====================
+
+====================
+     2018-07-28    
+====================
+
+====================
+     2018-07-27    
+====================
+
+====================
+     2018-07-26    
+====================
+
+====================
+     2018-07-25    
+====================
+
+====================
+     2018-07-24    
+====================
+
+====================
+     2018-07-23    
+====================
+
+====================
+     2018-07-22    
+====================
+
+====================
+     2018-07-21    
+====================
+
+====================
+     2018-07-20    
+====================
+d38e77c  Android: cpufreq_stats: Fix uninitialized variable  [Elektroschmock]
+
