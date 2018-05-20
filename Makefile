@@ -195,7 +195,7 @@ SUBARCH := $(shell uname -m | sed -e s/i.86/x86/ -e s/x86_64/x86/ \
 ARCH		?= $(SUBARCH)
 CROSS_COMPILE	?= $(CONFIG_CROSS_COMPILE:"%"=%)
 ARCH := arm
-CROSS_COMPILE := /home/holyangel/android/arm-cortex_a15-linux-gnueabihf/bin/arm-cortex_a15-linux-gnueabihf-
+CROSS_COMPILE := /home/holyangel/android/Toolchains/arm-cortex_a15-linux-gnueabihf/bin/arm-cortex_a15-linux-gnueabihf-
 
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
@@ -243,33 +243,35 @@ CONFIG_SHELL := $(shell if [ -x "$$BASH" ]; then echo $$BASH; \
 
 # SkyDragon Optimization Flags #
 
-# Graphite
-GRAPHITE	:= -fgraphite -fgraphite-identity -floop-nest-optimize 
+GRAPHITE = -fgraphite -fgraphite-identity -floop-interchange -ftree-loop-distribution -floop-strip-mine -floop-block -ftree-loop-linear
 
 # Extra GCC Optimizations	  
-EXTRA_OPTS	:= -falign-functions=1 -falign-loops=1 -falign-jumps=1 -falign-labels=1 \
-				-ftree-partial-pre  -fgcse -fgcse-lm -fgcse-sm -fgcse-las -fgcse-after-reload \
-				-ftree-vectorize 
-                 
-				
+EXTRA_OPTS := \
+	-falign-loops=1 -falign-functions=1 -falign-labels=1 -falign-jumps=1 \
+	-fira-hoist-pressure -fira-loop-pressure \
+	-fsched-pressure -fsched-spec-load -ftree-vectorize \
+	-fno-guess-branch-probability -fpredictive-commoning \
+	-fvect-cost-model=cheap -fsimd-cost-model=cheap \
+	-ftree-partial-pre -fno-gcse
+
 # Arm Architecture Specific
 # fall back to -march=armv8-a in case the compiler isn't compatible
 # with -mcpu and -mtune
-ARM_ARCH_OPT := $(call cc-option,-march=armv7-a) -mcpu=cortex-a15 -mtune=cortex-a15 --param l1-cache-line-size=64 \
+ARM_ARCH_OPT := $(call cc-option,-march=armv7-a-neon) -mcpu=cortex-a15 -mtune=cortex-a15 --param l1-cache-line-size=64 \
 				--param l1-cache-size=32 --param l2-cache-size=2048
 
 # Optional
 GEN_OPT_FLAGS := \
- -DNDEBUG -pipe \
- -fomit-frame-pointer -fivopts \
- -fmodulo-sched -fmodulo-sched-allow-regmoves
+ -DNDEBUG -g0 -pipe \
+ -fomit-frame-pointer 
+
  
 #####
 
 HOSTCC       = gcc
 HOSTCXX      = g++
-HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O3 -fomit-frame-pointer $(GEN_OPT_FLAGS) $(GRAPHITE) $(EXTRA_OPTS)
-HOSTCXXFLAGS = -O3 $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT) $(GRAPHITE) $(EXTRA_OPTS) -fdeclone-ctor-dtor -mfpu=neon-vfpv4-d32
+HOSTCFLAGS   = -Wall -Wmissing-prototypes -Wstrict-prototypes -O2 -fomit-frame-pointer $(GEN_OPT_FLAGS) $(EXTRA_OPTS)
+HOSTCXXFLAGS = -O2 $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT) $(EXTRA_OPTS) -fdeclone-ctor-dtor -mfpu=neon-vfpv4-d32
 
 # Decide whether to build built-in, modular, or both.
 # Normally, just do built-in.
@@ -353,7 +355,7 @@ include $(srctree)/scripts/Kbuild.include
 
 AS		= $(CROSS_COMPILE)as
 LD		= $(CROSS_COMPILE)ld
-REAL_CC		= $(CROSS_COMPILE)gcc
+CC		= $(CROSS_COMPILE)gcc -g0
 CPP		= $(CC) -E
 AR		= $(CROSS_COMPILE)ar
 NM		= $(CROSS_COMPILE)nm
@@ -367,16 +369,12 @@ DEPMOD		= /sbin/depmod
 PERL		= perl
 CHECK		= sparse
 
-# Use the wrapper for the compiler.  This wrapper scans for new
-# warnings and causes the build to stop upon encountering them.
-CC		= $(srctree)/scripts/gcc-wrapper.py $(REAL_CC)
-
 CHECKFLAGS     := -D__linux__ -Dlinux -D__STDC__ -Dunix -D__unix__ \
 		  -Wbitwise -Wno-return-void $(CF)
 CFLAGS_MODULE   = -DMODULE $(CFLAGS_KERNEL) -flto
 AFLAGS_MODULE   = -DMODULE $(CFLAGS_KERNEL) -flto
 LDFLAGS_MODULE  = --strip-debug
-CFLAGS_KERNEL	= -fno-prefetch-loop-arrays $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT) $(GRAPHITE) $(EXTRA_OPTS) -std=gnu89 
+CFLAGS_KERNEL	= -fno-prefetch-loop-arrays $(GEN_OPT_FLAGS) $(ARM_ARCH_OPT) $(EXTRA_OPTS) -std=gnu89 
 AFLAGS_KERNEL	= $(CFLAGS_KERNEL)
 CFLAGS_GCOV	= -fprofile-arcs -ftest-coverage
 
@@ -421,6 +419,7 @@ export ARCH SRCARCH CONFIG_SHELL HOSTCC HOSTCFLAGS CROSS_COMPILE AS LD CC
 export CPP AR NM STRIP OBJCOPY OBJDUMP
 export MAKE AWK GENKSYMS INSTALLKERNEL PERL UTS_MACHINE
 export HOSTCXX HOSTCXXFLAGS LDFLAGS_MODULE CHECK CHECKFLAGS
+export GEN_OPT_FLAGS ARM_ARCH_OPT EXTRA_OPTS
 
 export KBUILD_CPPFLAGS NOSTDINC_FLAGS LINUXINCLUDE OBJCOPYFLAGS LDFLAGS
 export KBUILD_CFLAGS CFLAGS_KERNEL CFLAGS_MODULE CFLAGS_GCOV
@@ -604,7 +603,7 @@ all: vmlinux
 ifdef CONFIG_CC_OPTIMIZE_FOR_SIZE
 KBUILD_CFLAGS	+= -Os $(call cc-disable-warning,maybe-uninitialized,)
 else
-KBUILD_CFLAGS	+= -O3 $(call cc-disable-warning,maybe-uninitialized,) $(CFLAGS_KERNEL) 
+KBUILD_CFLAGS	+= -O2 $(call cc-disable-warning,maybe-uninitialized,) $(CFLAGS_KERNEL) 
 KBUILD_CFLAGS += $(call cc-disable-warning,maybe-uninitialized)
 KBUILD_CFLAGS += $(call cc-disable-warning,array-bounds)
 endif
