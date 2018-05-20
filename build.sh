@@ -38,10 +38,10 @@
 	i=$k/out/arch/arm/boot/zImage-dtb
 
 # Destination Path for compiled modules
-	zm=$k/build/system/lib/modules
+	zm=$k/build/modules
 
 # Destination path for compiled Image.gz-dtb
-	zi=$k/build/kernel/zImage
+	zi=$k/build/zImage
 	
 # Source path for building kernel zip
 	zp=$k/build/
