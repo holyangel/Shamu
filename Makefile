@@ -637,15 +637,15 @@ endif
 
 include $(srctree)/arch/$(SRCARCH)/Makefile
 
-ifdef CONFIG_READABLE_ASM
+#ifdef CONFIG_READABLE_ASM
 # Disable optimizations that make assembler listings hard to read.
 # reorder blocks reorders the control in the function
 # ipa clone creates specialized cloned functions
 # partial inlining inlines only parts of functions
-KBUILD_CFLAGS += $(call cc-option,-fno-reorder-blocks,) \
-                 $(call cc-option,-fno-ipa-cp-clone,) \
-                 $(call cc-option,-fno-partial-inlining)
-endif
+#KBUILD_CFLAGS += $(call cc-option,-fno-reorder-blocks,) \
+#                 $(call cc-option,-fno-ipa-cp-clone,) \
+#                 $(call cc-option,-fno-partial-inlining)
+#endif
 
 ifneq ($(CONFIG_FRAME_WARN),0)
 KBUILD_CFLAGS += $(call cc-option,-Wframe-larger-than=${CONFIG_FRAME_WARN})
@@ -660,24 +660,24 @@ endif
 # Use make W=1 to enable this warning (see scripts/Makefile.build)
 KBUILD_CFLAGS += $(call cc-disable-warning, unused-but-set-variable)
 
-ifdef CONFIG_FRAME_POINTER
-KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
-else
+# ifdef CONFIG_FRAME_POINTER
+# KBUILD_CFLAGS	+= -fno-omit-frame-pointer -fno-optimize-sibling-calls
+# else
 # Some targets (ARM with Thumb2, for example), can't be built with frame
 # pointers.  For those, we don't have FUNCTION_TRACER automatically
 # select FRAME_POINTER.  However, FUNCTION_TRACER adds -pg, and this is
 # incompatible with -fomit-frame-pointer with current GCC, so we don't use
 # -fomit-frame-pointer with FUNCTION_TRACER.
-ifndef CONFIG_FUNCTION_TRACER
+# ifndef CONFIG_FUNCTION_TRACER
 KBUILD_CFLAGS	+= -fomit-frame-pointer
-endif
-endif
+# endif
+# endif
 
 KBUILD_CFLAGS   += $(call cc-option, -fno-var-tracking-assignments)
 
 ifdef CONFIG_DEBUG_INFO
-KBUILD_CFLAGS	+= -g
-KBUILD_AFLAGS	+= -gdwarf-2
+KBUILD_CFLAGS	+= -g0
+KBUILD_AFLAGS	+= -g0
 endif
 
 ifdef CONFIG_DEBUG_INFO_REDUCED
@@ -685,19 +685,19 @@ KBUILD_CFLAGS 	+= $(call cc-option, -femit-struct-debug-baseonly) \
 		   $(call cc-option,-fno-var-tracking)
 endif
 
-ifdef CONFIG_FUNCTION_TRACER
-ifdef CONFIG_HAVE_FENTRY
-CC_USING_FENTRY	:= $(call cc-option, -mfentry -DCC_USING_FENTRY)
-endif
-KBUILD_CFLAGS	+= -pg $(CC_USING_FENTRY)
-KBUILD_AFLAGS	+= $(CC_USING_FENTRY)
-ifdef CONFIG_DYNAMIC_FTRACE
-	ifdef CONFIG_HAVE_C_RECORDMCOUNT
-		BUILD_C_RECORDMCOUNT := y
-		export BUILD_C_RECORDMCOUNT
-	endif
-endif
-endif
+# ifdef CONFIG_FUNCTION_TRACER
+# ifdef CONFIG_HAVE_FENTRY
+# CC_USING_FENTRY	:= $(call cc-option, -mfentry -DCC_USING_FENTRY)
+# endif
+# KBUILD_CFLAGS	+= -pg $(CC_USING_FENTRY)
+# KBUILD_AFLAGS	+= $(CC_USING_FENTRY)
+# ifdef CONFIG_DYNAMIC_FTRACE
+# 	ifdef CONFIG_HAVE_C_RECORDMCOUNT
+# 		BUILD_C_RECORDMCOUNT := y
+# 		export BUILD_C_RECORDMCOUNT
+# 	endif
+# endif
+# endif
 
 # We trigger additional mismatches with less inlining
 ifdef CONFIG_DEBUG_SECTION_MISMATCH
