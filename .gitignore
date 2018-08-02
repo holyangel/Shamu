@@ -65,6 +65,7 @@ arch/*/include/generated
 
 # stgit generated dirs
 patches-*
+out
 
 # quilt's files
 patches
@@ -91,3 +92,7 @@ extra_certificates
 signing_key.priv
 signing_key.x509
 x509.genkey
+
+upload/
+
+build/
