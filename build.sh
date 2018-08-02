@@ -26,13 +26,13 @@
 	dc=sd_defconfig
 
 # Path to kernel source
-	k=/home/holyangel/android/Kernels/shamu
+	k=/home/holyangel/android/Kernels/shamul
 
 # Path to clean out
 	co=$k/out
 
 # Compile Path to out
-	o="O=/home/holyangel/android/Kernels/shamu/out"
+	o="O=/home/holyangel/android/Kernels/shamul/out"
 
 # Path to image.gz-dtb
 	i=$k/out/arch/arm/boot/zImage-dtb
