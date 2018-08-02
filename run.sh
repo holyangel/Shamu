@@ -27,13 +27,13 @@
 	dc=sd_defconfig
 
 # Source Path to kernel tree
-	k=/home/holyangel/android/Kernels/shamu
+	k=/home/holyangel/android/Kernels/shamul
 
 # Source Path to clean(empty) out folder
 	co=$k/out
 
 # Compile Path to out 
-	o="O=/home/holyangel/android/Kernels/shamu/out"
+	o="O=/home/holyangel/android/Kernels/shamul/out"
 
 ############################################################
 # Cleanup
