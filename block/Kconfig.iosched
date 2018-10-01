@@ -136,6 +136,9 @@ choice
 		  any workload. It also tries to guarantee low latency to
 		  interactive and soft real-time applications.
 
+	config DEFAULT_MAPLE
+		bool "Maple" if IOSCHED_MAPLE=y
+
 	config DEFAULT_NOOP
 		bool "No-op"
 		
