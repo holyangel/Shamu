@@ -1,87 +1,117 @@
 ====================
-     2018-08-02    
+     2018-10-01    
 ====================
-37216c3  Update for version 1.0  [Miguel Martinez]
-fb5cfab  VFP: Build with hardfloat and vfpv4-d32  [Miguel Martinez]
-835f981  Final settings for building with LLVM/Clang 6  [Miguel Martinez]
-6dfa756  Makefile: Disable Readable_ASM/Frame_Pointer/Function_Tracer  [Miguel Martinez]
-f62a0b0  Makefile: Set HolyDragon Optimization  [Miguel Martinez]
-723da53  Makefile: Import HolyDragon Optimization flags for Krait  [Miguel Martinez]
-61eb4b6  Makefile: set toolchain  [Miguel Martinez]
-8479ffc  configs: set all settings for sd_defconfig  [Miguel Martinez]
-9808846  power: disable battery current limit hotplugging  [Miguel Martinez]
-b109d42  power: import fast charge support  [Miguel Martinez]
-fc97bb0  Scripts: Cleanup local version  [Miguel Martinez]
-6d95d49  devfreq: fix simple ondemand gpu algorithm  [Miguel Martinez]
-47e7b42  kgsl: schedule on high priority  [Miguel Martinez]
-d883382  devfreq: allocate on high priority workqueue  [Miguel Martinez]
-5f5df65  sounds: Import faux sound control 3  [Miguel Martinez]
-2f735b0  sound: optimize for size  [Miguel Martinez]
-91e0c9e  video: import savoca kcal control  [Miguel Martinez]
-a2cb1192  Import display_state header for Maple IO  [Miguel Martinez]
-325c771  fs/dcache: set vfs_cache_pressure to zero  [Miguel Martinez]
-9a9ac17  mm/vmscan: set swappiness to zero  [Miguel Martinez]
-36c3a7e  build: fix scripts pt2  [Miguel Martinez]
-e0454ef  block: Import Maple and Zen IOSchedulers  [Miguel Martinez]
-0872955  dts: Allow 27mhz gpu clock step and set as default  [Miguel Martinez]
-acb4dc0  compressed: target a15  [Miguel Martinez]
-67fc479  build: Fix scripts  [Miguel Martinez]
-107af62  Update gitignore  [Miguel Martinez]
-e348dc3  Import exfat  [Miguel Martinez]
-96898e5  include: Update compilers  [Miguel Martinez]
-cadcc9e  Create sd_defconfig  [Miguel Martinez]
-207f176  Import build system  [Miguel Martinez]
+7688501  power: import fast charge support  [Miguel Martinez]
+2a1f42f  sounds: Import faux sound control 3  [Miguel Martinez]
+23111b7  sound: optimize for size  [Miguel Martinez]
+49d12d4  video: import savoca kcal control  [Miguel Martinez]
+680590e  Import exfat  [Miguel Martinez]
+99b5d15  Update gitignore  [Miguel Martinez]
+c8efbe8  Makefile: Set HolyDragon Optimization  [Miguel Martinez]
+75d1b97  Makefile: Disable Readable_ASM/Frame_Pointer/Function_Tracer  [Miguel Martinez]
+b4e9771  VFP: Build with hardfloat and vfpv4-d32  [Miguel Martinez]
+43d4b78  dts: Allow 27mhz gpu clock step and set as default  [Miguel Martinez]
+d0975fc  compressed: target a15  [Miguel Martinez]
+09f15b8  fs/dcache: set vfs_cache_pressure to zero  [Miguel Martinez]
+f8a00f8  include: Update compilers  [Miguel Martinez]
+9194d63  mm/vmscan: set swappiness to zero  [Miguel Martinez]
+a9dc35c  Makefile: OBJCOPY should strip-unneeded  [Miguel Martinez]
+c6561da  Cleanup local version  [Miguel Martinez]
+342d299  Fix uninitialized warnings  [Miguel Martinez]
+42d2757  Makefile: remove no-bool-compare  [Miguel Martinez]
+41481e9  apq8084: add missing regulator setting  [Miguel Martinez]
+fb9d191  shamu: BCL: Use frequency mitigation on all cores  [elektroschmock]
+a7ba9b2  ARM: dts: msm: disable support of 50MHz for i2c for apq8084  [Ankit Gupta]
+5c65d9b  msm-pm: disable debugging  [Miguel Martinez]
+2bff52a  kgsl: switch to alloc_workqueue  [Miguel Martinez]
+54ec30b  msm: kgsl: Fix the race between context create and destroy  [Sunil Khatri]
+a4ab2f2  msm: kgsl: Unbind the kgsl-event workqueue  [Jonathan Wicks]
+0a4b699  msm: kgsl: Reserve a context ID slot but don't populate immediately  [Steve Pfetsch]
+3638c80  kgsl: convert some workqueues to use kthreads  [Francisco Franco]
+4ae072a  PM: devfreq: Use high priority workqueue  [myfluxi]
+1b47814  Build changelog  [Miguel Martinez]
+0f64bcf  include/linux: update compiler headers  [Miguel Martinez]
+04af1cd  arm: add vfp to abi flags  [Miguel Martinez]
+40924f9  Makefile: disable fomit-frame-pointer/ftracer/readable asm  [Miguel Martinez]
+7cb6106  scripts: update for using LLVM/Clang  [Miguel Martinez]
+eada8d6  Fix for LLD  [Miguel Martinez]
+da7a032  Makefile: Change to HolyDragon Optimization for Krait  [Miguel Martinez]
+a5757de  Makefile: Update toolchain folder  [Miguel Martinez]
+821b268  build: fixup build paths  [Miguel Martinez]
+4f7098b  Ensure Maple IO is default  [Miguel Martinez]
+47c5672  Add Maple IO  [Miguel Martinez]
+423816d  Topology: Enhance For MultiCore Decision Making  [XileForce]
+46cb019  display: add a simple api to query the display state (on/off) at any point in time  [franciscofranco]
+fc60a2e  Kernel/sched: Reduce latency for better responsiveness  [holyangel]
+6665687  PM: devfreq: Fix simple_ondemand crashing on startup  [myfluxi]
+f782620  Increase readahead  [Miguel Martinez]
+cdb98f9  binfmt_elf.c: use get_random_int() to fix entropy depleting  [Jeff Liu]
+420b825   Optimize apply_slack() for size and speed http://lkml.indiana.edu/…  [GuneetAtwal]
+31f63f2    NOATIME and NODIRATIME by default  [GuneetAtwal]
+4075d17  Remove '+' symbol from kernel version string  [franciscofranco]
+51c01a2  PM: devfreq: Use high priority workqueue  [myfluxi]
 
 ====================
-     2018-08-01    
-====================
-
-====================
-     2018-07-31    
-====================
-
-====================
-     2018-07-30    
-====================
-
-====================
-     2018-07-29    
-====================
-
-====================
-     2018-07-28    
-====================
-
-====================
-     2018-07-27    
-====================
-
-====================
-     2018-07-26    
+     2018-09-30    
 ====================
 
 ====================
-     2018-07-25    
+     2018-09-29    
 ====================
 
 ====================
-     2018-07-24    
+     2018-09-28    
 ====================
 
 ====================
-     2018-07-23    
+     2018-09-27    
+====================
+86b49ab  ARM: dts: msm: Remove Gfx warm to normal temperature monitor  [Shiju Mathew]
+5c74a80  ARM: dts: msm: Fix boolean property misuse  [Stepan Moskovchenko]
+
+====================
+     2018-09-26    
 ====================
 
 ====================
-     2018-07-22    
+     2018-09-25    
 ====================
 
 ====================
-     2018-07-21    
+     2018-09-24    
+====================
+c593a42  futex: Remove unnecessary warning from get_futex_key  [Mel Gorman]
+867cc78  l2tp: pass tunnel pointer to ->session_create()  [Guillaume Nault]
+188e961  BACKPORT: l2tp: prevent creation of sessions on terminated tunnels  [Guillaume Nault]
+c79363c  BACKPORT: l2tp: initialise session's refcount before making it reachable  [Guillaume Nault]
+75b4077  net: usb: rmnet_usb_ctrl:Make sure list_head operate atomically  [Liangliang Lu]
+472f440  net: usb: rmnet_usb_ctrl: Fix return value of rmnet_ctl_write()  [Hemant Kumar]
+90afb4e  udp: avoid ufo handling on IP payload compression packets  [Alexey Kodanev]
+19a75f9  ipv6: Don't use ufo handling on later transformed packets  [Jakub Sitnicki]
+
+====================
+     2018-09-23    
 ====================
 
 ====================
-     2018-07-20    
+     2018-09-22    
 ====================
-d38e77c  Android: cpufreq_stats: Fix uninitialized variable  [Elektroschmock]
+
+====================
+     2018-09-21    
+====================
+
+====================
+     2018-09-20    
+====================
+
+====================
+     2018-09-19    
+====================
+f81a229  UPSTREAM: block: disable entropy contributions for nonrot devices  [Mike Snitzer]
+cb55ffb  shamu: defconfig: Set default IO scheduler to noop and regenerate  [elektroschmock]
+
+====================
+     2018-09-18    
+====================
 
