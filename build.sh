@@ -50,7 +50,7 @@
 	zu=$k/upload/
 
 # Kernel zip Name
-	kn=SDK_Shamu_V3.zip
+	kn=HDK_Shamu_LOS_V2.zip
 
 ##############################
 
